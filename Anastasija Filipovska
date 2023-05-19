@@ -1,0 +1,121 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+class Employee
+{
+protected:
+    char ime[20];
+    int godini;
+public:
+    Employee(char *ime=" ",int godini=0)
+    {
+        strcpy(this->ime,ime);
+        this->godini=godini;
+    }
+    virtual void displayInfo()=0;
+    virtual ~Employee(){
+    }
+};
+class Payable
+{
+protected:
+    float plata;
+public:
+    Payable(float plata=0)
+    {
+        this->plata=plata;
+    }
+    virtual float calculateSalary()=0;
+    virtual ~Payable(){}
+};
+class Developer:public Employee,public Payable
+{
+private:
+    char programskijazik[20];
+public:
+    Developer(){}
+    Developer(char *ime,int godini,float plata,char *pj=" "): Employee(ime,godini),Payable(plata)
+    {
+        strcpy(programskijazik,pj);
+    }
+    ~Developer(){}
+    float calculateSalary()
+    {
+        return plata-(plata*0.10);
+    }
+    void displayInfo()
+    {
+        cout<<"-- Developer Information --" <<endl;
+        cout<<"Name: "<<ime<<endl;
+        cout<<"Age: "<<godini<<endl;
+        cout<<"Salary: $"<<calculateSalary()<< endl;
+        cout<<"Programming Language: "<<programskijazik<<endl;
+    }
+};
+class Manager:public Employee,public Payable {
+private:
+    int brojOddeli;
+public:
+    Manager(){}
+    Manager(char *ime, int godini, float plata, int brojOdeli) : Employee(ime, godini), Payable(plata)
+    {
+        this->brojOddeli=brojOdeli;
+    }
+    float calculateSalary()
+    {
+        return plata + brojOddeli * (plata * 0.05);
+    }
+    void displayInfo() {
+        cout << "-- Manager Information --" << endl;
+        cout << "Name: " << ime << endl;
+        cout << "Age: " << godini << endl;
+        cout << "Salary: $" << calculateSalary() << endl;
+        cout << "Number of Departments: " << brojOddeli << endl;
+    }
+    ~Manager(){}
+};
+double biggestSalary(Payable* payable[], int n)
+{
+    double biggestsalary=payable[0]->calculateSalary();
+    for(int i=0; i<n; i++)
+    {
+        if(biggestsalary<payable[i]->calculateSalary())
+        {
+            biggestsalary=payable[i]->calculateSalary();
+        }
+    }
+    return biggestsalary;
+}
+int main()
+{
+    Payable* payable[5];
+    Developer developers[5];
+    Manager managers[5];
+    int j=0, k=0;
+    for(int i=0; i<5; i++)
+    {
+        char name[50];
+        int age;
+        double salary;
+        cin>>name>>age>>salary;
+        if(i%2==0)
+        {
+            char programmingLanguage[50];
+            cin>>programmingLanguage;
+            developers[j]=Developer(name, age, salary, programmingLanguage);
+            developers[j].displayInfo();
+            payable[i]=&developers[j];
+            j++;
+        }
+        else {
+            int numberOfDepartments;
+            cin>>numberOfDepartments;
+            managers[k]=Manager(name, age, salary, numberOfDepartments);
+            managers[k].displayInfo();
+            payable[i]=&managers[k];
+            k++;
+        }
+    }
+    cout<<endl<<"Biggest Salary: "<<biggestSalary(payable, 5);
+    return 0;
+}
